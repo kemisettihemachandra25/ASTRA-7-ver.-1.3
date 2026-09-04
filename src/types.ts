@@ -51,6 +51,10 @@ export interface AnomalyPreset {
   failureScenarios?: {
     singleAgentOfflineMsg?: Record<string, string>;
     bothAgentsOfflineMsg?: string;
+    bothOffline?: string;
+    alphaOffline?: string;
+    betaOffline?: string;
+    gammaOffline?: string;
   };
   journalLogs: {
     time: string;

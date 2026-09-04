@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AgentStatus, HistoricalIncident } from '../types';
 import { HISTORICAL_INCIDENTS } from '../data/mockFlightData';
 import { DatabaseExplorerView } from './DatabaseExplorerView';
+import { SandboxTrialTraceViewer } from './SandboxTrialTraceViewer';
+import {
+  sandboxTrialRecorder,
+  exportTrialsToCsv,
+  exportTrialsToText,
+  RecordedSandboxTrial,
+} from '../utils/sandboxTrialRecorder';
 import { sound } from '../utils/audio';
 import {
   Download,
@@ -13,8 +20,11 @@ import {
   BatteryCharging,
   Flame,
   FileSpreadsheet,
+  FileText,
+  Terminal,
   Database,
   Layers,
+  ArrowRight,
 } from 'lucide-react';
 
 interface AnalyticsScreenProps {
@@ -22,10 +32,31 @@ interface AnalyticsScreenProps {
 }
 
 export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ agents }) => {
-  const [activeTab, setActiveTab] = useState<'analytics' | 'database'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'database' | 'sandbox-trials'>('analytics');
   const [incidentFilter, setIncidentFilter] = useState<string>('ALL');
   const [incidents] = useState<HistoricalIncident[]>(HISTORICAL_INCIDENTS);
   const [telemetryTimeframe, setTelemetryTimeframe] = useState<'30D' | '60D' | '90D'>('90D');
+  const [sandboxTrials, setSandboxTrials] = useState<RecordedSandboxTrial[]>(() =>
+    sandboxTrialRecorder.getTrials()
+  );
+
+  useEffect(() => {
+    const handleUpdate = () => {
+      setSandboxTrials([...sandboxTrialRecorder.getTrials()]);
+    };
+    window.addEventListener('orion7_sandbox_trials_updated', handleUpdate);
+    return () => window.removeEventListener('orion7_sandbox_trials_updated', handleUpdate);
+  }, []);
+
+  const handleDownloadTrialCsv = () => {
+    sound.playClick();
+    exportTrialsToCsv(sandboxTrials);
+  };
+
+  const handleDownloadTrialText = () => {
+    sound.playClick();
+    exportTrialsToText(sandboxTrials);
+  };
 
   const filteredIncidents =
     incidentFilter === 'ALL'
@@ -110,6 +141,21 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ agents }) => {
         <button
           onClick={() => {
             sound.playClick();
+            setActiveTab('sandbox-trials');
+          }}
+          className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-all cursor-pointer ${
+            activeTab === 'sandbox-trials'
+              ? 'bg-cyan-500 text-black font-bold shadow-md'
+              : 'bg-[#0f172a] text-slate-400 hover:text-white border border-[#1e293b]'
+          }`}
+        >
+          <Terminal size={14} />
+          SANDBOX TRIAL JOURNAL TRACES ({sandboxTrials.length})
+        </button>
+
+        <button
+          onClick={() => {
+            sound.playClick();
             setActiveTab('database');
           }}
           className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-all cursor-pointer ${
@@ -125,6 +171,11 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ agents }) => {
 
       {activeTab === 'database' ? (
         <DatabaseExplorerView />
+      ) : activeTab === 'sandbox-trials' ? (
+        <SandboxTrialTraceViewer
+          trials={sandboxTrials}
+          onRefresh={() => setSandboxTrials([...sandboxTrialRecorder.getTrials()])}
+        />
       ) : (
         <>
           {/* Header Bar with Export Options */}
@@ -148,7 +199,23 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ agents }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 font-mono text-xs">
+        <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+          <button
+            onClick={handleDownloadTrialText}
+            className="px-3 py-2 rounded-xl bg-[#05070a] border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm font-semibold"
+            title="Download formatted text trace of all recorded sandbox trials"
+          >
+            <FileText size={13} className="text-cyan-400" />
+            DOWNLOAD TRIAL TRACE (TXT)
+          </button>
+          <button
+            onClick={handleDownloadTrialCsv}
+            className="px-3 py-2 rounded-xl bg-[#05070a] border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm font-semibold"
+            title="Download CSV trace of all recorded sandbox trials"
+          >
+            <FileSpreadsheet size={13} className="text-emerald-400" />
+            DOWNLOAD TRIAL TRACE (CSV)
+          </button>
           <button
             onClick={handleExportCsv}
             className="px-3 py-2 rounded-xl bg-[#05070a] border border-[#1e293b] hover:border-cyan-400 text-slate-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
@@ -349,6 +416,92 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ agents }) => {
             })}
           </div>
         </div>
+      </div>
+
+      {/* Sandbox Trial Journal Trace Summary & Download Card */}
+      <div className="bg-[#0f172a] border border-cyan-500/30 p-5 rounded-3xl flex flex-col gap-4 shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1e293b] pb-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 shadow-sm">
+              <Terminal size={18} />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs uppercase text-white font-bold tracking-wide">
+                  Sandbox Trial Journal Logs & Telemetry Trace Records
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/40">
+                  {sandboxTrials.length} RUNS ARCHIVED
+                </span>
+              </div>
+              <span className="text-[11px] text-slate-400 font-mono">
+                Real-time multi-agent reasoning trace logs captured during Chaos Anomaly Lab benchmark trials
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+            <button
+              onClick={handleDownloadTrialText}
+              className="px-3 py-2 rounded-xl bg-[#05070a] border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm font-semibold"
+            >
+              <FileText size={13} className="text-cyan-400" />
+              DOWNLOAD ALL TRACES (.TXT)
+            </button>
+            <button
+              onClick={handleDownloadTrialCsv}
+              className="px-3 py-2 rounded-xl bg-[#05070a] border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm font-semibold"
+            >
+              <FileSpreadsheet size={13} className="text-emerald-400" />
+              DOWNLOAD ALL TRACES (.CSV)
+            </button>
+            <button
+              onClick={() => {
+                sound.playClick();
+                setActiveTab('sandbox-trials');
+              }}
+              className="px-3.5 py-2 rounded-xl bg-cyan-500 text-black font-bold uppercase hover:bg-cyan-400 flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+            >
+              INSPECT FULL JOURNAL TRACES
+              <ArrowRight size={13} />
+            </button>
+          </div>
+        </div>
+
+        {/* Quick Summary of the latest sandbox trial */}
+        {sandboxTrials.length > 0 && (
+          <div className="bg-[#05070a] border border-[#1e293b] p-3 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+            <div className="flex items-center gap-2">
+              <span className="text-slate-500 text-[10px]">LATEST TEST RUN:</span>
+              <span className="text-cyan-400 font-bold">{sandboxTrials[0].trialId}</span>
+              <span className="text-slate-300 font-semibold">{sandboxTrials[0].presetTitle}</span>
+              <span className="text-slate-500 text-[10px]">
+                ({sandboxTrials[0].entries.length} trace events recorded)
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
+                  sandboxTrials[0].outcome === 'REMEDIATED'
+                    ? 'bg-emerald-500/20 text-emerald-400'
+                    : 'bg-rose-500/20 text-rose-300'
+                }`}
+              >
+                {sandboxTrials[0].outcome}
+              </span>
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  exportTrialsToText([sandboxTrials[0]]);
+                }}
+                className="text-[10px] text-cyan-400 hover:underline cursor-pointer"
+              >
+                Download Latest (.txt)
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Historical Incidents Archive Table */}

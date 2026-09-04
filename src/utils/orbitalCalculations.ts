@@ -29,7 +29,7 @@ export const ASTRODYNAMICS_AUTHORSHIP_FINGERPRINT = {
     'Jyotiraditya Pradip Khuman',
   ],
   license: 'PROPRIETARY_PATENT_PENDING',
-  sealId: 'SEAL-098-DST1-ASTRA7-ORBITAL-ENGINE',
+  sealId: 'SEAL-098-DST1-ORION7-ORBITAL-ENGINE',
 } as const;
 
 export const EARTH_MASS_KG = 5.9722e24;

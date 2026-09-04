@@ -327,7 +327,7 @@ export const PropellantlessControlScreen: React.FC = () => {
 
       setSimTime((prev) => prev + speed);
 
-      // Mass of ASTRA-7 satellite: ~450 kg
+      // Mass of ORION-7 satellite: ~450 kg
       const massKg = 450;
       // Acceleration in m/s^2: F (in N) / mass
       const accelMs2 = (currentNetThrust / 1000) / massKg;

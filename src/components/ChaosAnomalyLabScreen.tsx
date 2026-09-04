@@ -5,6 +5,7 @@ import { sound } from '../utils/audio';
 import { getISTTimeWithMs } from '../utils/time';
 import { orbitGuardApi } from '../services/orbitGuardApi';
 import { VideogameLoadingSlider } from './VideogameLoadingSlider';
+import { sandboxTrialRecorder } from '../utils/sandboxTrialRecorder';
 import {
   Play,
   RotateCcw,
@@ -176,30 +177,34 @@ export const ChaosAnomalyLabScreen: React.FC<ChaosAnomalyLabScreenProps> = ({
   // Dynamic failure reason resolving single, multiple, or FDIR offline states
   const getDynamicFailureReason = (): string | null => {
     if (activePreset.failureScenarios) {
+      const fs = activePreset.failureScenarios;
+      const bothMsg = fs.bothOffline || fs.bothAgentsOfflineMsg;
+      const singleMsgs = fs.singleAgentOfflineMsg || {};
+
       if (activePreset.id === 'thermal_attitude_coupling') {
         const isAlphaOff = agents.find((a) => a.id === 'alpha')?.isolated;
         const isBetaOff = agents.find((a) => a.id === 'beta')?.isolated;
-        if (isAlphaOff && isBetaOff && activePreset.failureScenarios.bothOffline) {
-          return activePreset.failureScenarios.bothOffline;
+        if (isAlphaOff && isBetaOff && bothMsg) {
+          return bothMsg;
         }
-        if (isAlphaOff && activePreset.failureScenarios.alphaOffline) {
-          return activePreset.failureScenarios.alphaOffline;
+        if (isAlphaOff && (fs.alphaOffline || singleMsgs.alpha)) {
+          return fs.alphaOffline || singleMsgs.alpha;
         }
-        if (isBetaOff && activePreset.failureScenarios.betaOffline) {
-          return activePreset.failureScenarios.betaOffline;
+        if (isBetaOff && (fs.betaOffline || singleMsgs.beta)) {
+          return fs.betaOffline || singleMsgs.beta;
         }
       }
       if (activePreset.id === 'orbit_attitude_burn') {
         const isBetaOff = agents.find((a) => a.id === 'beta')?.isolated;
         const isGammaOff = agents.find((a) => a.id === 'gamma')?.isolated;
-        if (isBetaOff && isGammaOff && activePreset.failureScenarios.bothOffline) {
-          return activePreset.failureScenarios.bothOffline;
+        if (isBetaOff && isGammaOff && bothMsg) {
+          return bothMsg;
         }
-        if (isBetaOff && activePreset.failureScenarios.betaOffline) {
-          return activePreset.failureScenarios.betaOffline;
+        if (isBetaOff && (fs.betaOffline || singleMsgs.beta)) {
+          return fs.betaOffline || singleMsgs.beta;
         }
-        if (isGammaOff && activePreset.failureScenarios.gammaOffline) {
-          return activePreset.failureScenarios.gammaOffline;
+        if (isGammaOff && (fs.gammaOffline || singleMsgs.gamma)) {
+          return fs.gammaOffline || singleMsgs.gamma;
         }
       }
     }
@@ -229,6 +234,9 @@ export const ChaosAnomalyLabScreen: React.FC<ChaosAnomalyLabScreenProps> = ({
       : activePreset.recoveryTime;
 
   const resetSim = async () => {
+    if (simRunningRef.current) {
+      sandboxTrialRecorder.finishTrial('ABORTED', 'Simulation reset by operator');
+    }
     simRunningRef.current = false;
     simTimeRef.current = 0;
     simStageRef.current = 'idle';
@@ -298,6 +306,23 @@ export const ChaosAnomalyLabScreen: React.FC<ChaosAnomalyLabScreenProps> = ({
     };
     setJournalLogs([initialEntry]);
 
+    // Record new trial in persistent sandbox recorder
+    const activeTrialId = sandboxTrialRecorder.startTrial({
+      presetId: activePreset.id,
+      presetTitle: activePreset.title,
+      subsystem: activePreset.subsystem,
+      telemetryChannel: activePreset.telemetryChannel,
+      severityLevel,
+      autonomySetting,
+    });
+    sandboxTrialRecorder.recordLog({
+      simTime: initialEntry.timestamp,
+      agent: initialEntry.agent,
+      tag: initialEntry.tag,
+      tagColor: initialEntry.tagColor,
+      message: initialEntry.message,
+    }, activeTrialId);
+
     // Map active preset to OrbitGuard supported anomaly types
     const ogAnomalyType =
       activePreset.id === 'adcs'
@@ -361,6 +386,15 @@ export const ChaosAnomalyLabScreen: React.FC<ChaosAnomalyLabScreenProps> = ({
 
         if (logsToAdd.length > 0) {
           setJournalLogs((prev) => [...prev, ...logsToAdd]);
+          logsToAdd.forEach((l) => {
+            sandboxTrialRecorder.recordLog({
+              simTime: '+00:01.20',
+              agent: l.agent,
+              tag: l.tag,
+              tagColor: l.tagColor,
+              message: l.message,
+            }, activeTrialId);
+          });
         }
       })
       .catch((err) => {
@@ -427,12 +461,28 @@ export const ChaosAnomalyLabScreen: React.FC<ChaosAnomalyLabScreenProps> = ({
           };
 
           setJournalLogs((prev) => [...prev, fatalEntry, fatalEntry2]);
+          sandboxTrialRecorder.recordLog({
+            simTime: fatalEntry.timestamp,
+            agent: fatalEntry.agent,
+            tag: fatalEntry.tag,
+            tagColor: fatalEntry.tagColor,
+            message: fatalEntry.message,
+          });
+          sandboxTrialRecorder.recordLog({
+            simTime: fatalEntry2.timestamp,
+            agent: fatalEntry2.agent,
+            tag: fatalEntry2.tag,
+            tagColor: fatalEntry2.tagColor,
+            message: fatalEntry2.message,
+          });
+          sandboxTrialRecorder.finishTrial('CATASTROPHIC_FAILURE', failureReason);
         }
       } else {
         if (nextTime >= effectiveRecoveryTime && curStage !== 'remediated') {
           simStageRef.current = 'remediated';
           setSimStage('remediated');
           sound.playRemediated();
+          sandboxTrialRecorder.finishTrial('REMEDIATED');
           if (onUpdateAlertCount) {
             setTimeout(() => onUpdateAlertCount(0, 0), 0);
           }
@@ -465,15 +515,23 @@ export const ChaosAnomalyLabScreen: React.FC<ChaosAnomalyLabScreenProps> = ({
         ) {
           // Suppress successful consensus/remediation logs when failure condition is active
         } else {
+          const simTimeFormatted = `+00:${String(Math.floor(nextTime)).padStart(2, '0')}.${String(
+            Math.floor((nextTime % 1) * 100)
+          ).padStart(2, '0')}`;
+          sandboxTrialRecorder.recordLog({
+            simTime: simTimeFormatted,
+            agent: matchingLog.agent,
+            tag: matchingLog.tag,
+            tagColor: matchingLog.tagColor,
+            message: matchingLog.message,
+          });
           setJournalLogs((current) => {
             if (current.some((e) => e.message === matchingLog.message)) return current;
             return [
               ...current,
               {
                 id: `log-${Date.now()}-${Math.random()}`,
-                timestamp: `+00:${String(Math.floor(nextTime)).padStart(2, '0')}.${String(
-                  Math.floor((nextTime % 1) * 100)
-                ).padStart(2, '0')}`,
+                timestamp: simTimeFormatted,
                 agent: matchingLog.agent,
                 tag: matchingLog.tag,
                 tagColor: matchingLog.tagColor,
@@ -532,6 +590,13 @@ export const ChaosAnomalyLabScreen: React.FC<ChaosAnomalyLabScreenProps> = ({
     };
 
     setJournalLogs((prev) => [...prev, newEntry]);
+    sandboxTrialRecorder.recordLog({
+      simTime: newEntry.timestamp,
+      agent: newEntry.agent,
+      tag: newEntry.tag,
+      tagColor: newEntry.tagColor,
+      message: newEntry.message,
+    });
     setCustomOverrideInput('');
   };
 
@@ -2527,16 +2592,22 @@ export const ChaosAnomalyLabScreen: React.FC<ChaosAnomalyLabScreenProps> = ({
 
       {/* Real-time Multi-Agent Diagnostic Command Journal */}
       <div className="bg-[#0f172a] border border-[#1e293b] p-5 rounded-3xl flex flex-col gap-4 shadow-xl">
-        <div className="flex items-center justify-between border-b border-[#1e293b]/60 pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#1e293b]/60 pb-3">
           <div className="flex items-center gap-2">
             <Zap size={14} className="text-cyan-400" />
             <span className="text-xs uppercase text-slate-200 font-semibold tracking-wide">
               Live Diagnostic Command Journal & Trace Log
             </span>
           </div>
-          <span className="text-[10px] font-mono text-slate-400">
-            {journalLogs.length} LOG EVENTS STREAMING
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1.5 text-[9px] font-mono text-cyan-400 bg-cyan-950/60 border border-cyan-500/30 px-2.5 py-0.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              RECORDING TO TRIAL LOG (DOWNLOADABLE IN ANALYTICS)
+            </span>
+            <span className="text-[10px] font-mono text-slate-400">
+              {journalLogs.length} LOG EVENTS STREAMING
+            </span>
+          </div>
         </div>
 
         <div

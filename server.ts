@@ -1,5 +1,5 @@
 /**
- * ASTRA-7 Aerospace Digital Twin & Swarm Operations Gateway
+ * ORION-7 Aerospace Digital Twin & Swarm Operations Gateway
  * Smart Horizon 48-Hour Hackathon | Team 098 | Topic: DST-1
  * Authors & Inventors:
  *   1. L Steven Dylan

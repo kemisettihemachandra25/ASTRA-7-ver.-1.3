@@ -1,4 +1,4 @@
-# ASTRA-7 Autonomous Satellite Digital Twin & Swarm Operations Console
+# ORION-7 Autonomous Satellite Digital Twin & Swarm Operations Console
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-61dafb.svg?logo=react)](https://react.dev/)
@@ -9,7 +9,7 @@
 [![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![Status](https://img.shields.io/badge/IP-Patent%20Pending-critical.svg)](LICENSE)
 
-An aerospace-grade, real-time digital twin, multi-agent autonomous swarm mission operations console, and propellantless orbital mechanics laboratory for Low Earth Orbit (LEO) satellite **ASTRA-7** (NORAD ID: 59402, 545 km circular orbit, 51.6° inclination).
+An aerospace-grade, real-time digital twin, multi-agent autonomous swarm mission operations console, and propellantless orbital mechanics laboratory for Low Earth Orbit (LEO) satellite **ORION-7** (NORAD ID: 59402, 545 km circular orbit, 51.6° inclination).
 
 Integrated with **OrbitGuard Autonomous Satellite Interlocks** and **Google Gemini AI Multi-Model Reasoning** for automated fault detection, Byzantine swarm consensus, and deterministic contingency recovery.
 
@@ -132,8 +132,8 @@ Direct integration with the OrbitGuard hardware-in-the-loop and software verific
 ### 1. Installation
 Clone the repository and install npm dependencies:
 ```bash
-git clone https://github.com/your-username/astra7-satellite-digital-twin.git
-cd astra7-satellite-digital-twin
+git clone https://github.com/your-username/orion7-satellite-digital-twin.git
+cd orion7-satellite-digital-twin
 npm install
 ```
 

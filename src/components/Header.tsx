@@ -4,8 +4,6 @@ import { sound } from '../utils/audio';
 import { orbitGuardApi } from '../services/orbitGuardApi';
 import {
   Satellite,
-  Radio,
-  ShieldAlert,
   ShieldCheck,
   AlertTriangle,
   Volume2,

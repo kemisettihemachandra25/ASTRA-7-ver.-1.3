@@ -3,10 +3,10 @@
 -- Targets: 7 Satellites (6-10 target), 35 Subsystems (30-42 target)
 -- ============================================================================
 
--- Primary Satellite ASTRA-7 and Constellation
+-- Primary Satellite ORION-7 and Constellation
 INSERT INTO satellites (name, status, id, norad_id, international_designator, orbit_type, altitude_km, inclination_deg, autonomy_mode, launch_date)
 VALUES 
-    ('ASTRA-7', 'NOMINAL', 'a0000000-0000-0000-0000-000000000001', 59124, '2024-042A', 'LEO', 541.80, 97.450, 'L4_AUTONOMOUS', '2024-03-15T00:00:00Z'),
+    ('ORION-7', 'NOMINAL', 'a0000000-0000-0000-0000-000000000001', 59124, '2024-042A', 'LEO', 541.80, 97.450, 'L4_AUTONOMOUS', '2024-03-15T00:00:00Z'),
     ('ORBIT-GUARD-1', 'NOMINAL', 'a0000000-0000-0000-0000-000000000002', 59125, '2024-042B', 'LEO', 542.10, 97.450, 'L4_AUTONOMOUS', '2024-03-15T00:00:00Z'),
     ('ORBIT-GUARD-2', 'NOMINAL', 'a0000000-0000-0000-0000-000000000003', 59126, '2024-042C', 'LEO', 540.90, 97.450, 'L4_AUTONOMOUS', '2024-03-15T00:00:00Z'),
     ('LEO-SENTINEL-A', 'NOMINAL', 'a0000000-0000-0000-0000-000000000004', 59201, '2024-055A', 'LEO', 545.00, 97.500, 'HITL_SUPERVISED', '2024-05-10T00:00:00Z'),
@@ -18,7 +18,7 @@ ON CONFLICT (id) DO NOTHING;
 -- Subsystems for Satellites (35 Subsystems total)
 INSERT INTO subsystems (id, satellite_id, subsystem_code, name, status, health_score, criticality)
 VALUES
-    -- ASTRA-7 (5 Subsystems)
+    -- ORION-7 (5 Subsystems)
     ('b0000000-0001-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'EPS', 'Electrical Power System & Batteries', 'HEALTHY', 99.4, 'MISSION_CRITICAL'),
     ('b0000000-0001-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000001', 'ADCS', 'Attitude Determination & Reaction Wheels', 'HEALTHY', 98.8, 'MISSION_CRITICAL'),
     ('b0000000-0001-0000-0000-000000000003', 'a0000000-0000-0000-0000-000000000001', 'PROP', 'Hydrazine Thrusters & Monopropellant', 'HEALTHY', 97.9, 'MISSION_CRITICAL'),

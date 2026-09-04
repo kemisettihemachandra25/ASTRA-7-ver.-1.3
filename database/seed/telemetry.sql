@@ -1,6 +1,6 @@
 -- ============================================================================
 -- Seed: Initial High-Resolution Telemetry Streams
--- Provides realistic nominal time-series telemetry for ASTRA-7 subsystems
+-- Provides realistic nominal time-series telemetry for ORION-7 subsystems
 -- ============================================================================
 
 INSERT INTO telemetry (satellite_id, subsystem_id, metric_name, metric_value, unit, raw_status, captured_at)
