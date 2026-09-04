@@ -1577,23 +1577,53 @@ export const ChaosAnomalyLabScreen: React.FC<ChaosAnomalyLabScreenProps> = ({
             </span>
           </div>
 
-          <div className="flex items-center flex-wrap gap-4 text-[10px] font-mono">
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-0.5 bg-green-400 inline-block rounded-full"></span>
-              <span className="text-slate-400">Nominal Baseline ({activePreset.baselineMetric})</span>
+          <div className="flex items-center flex-wrap gap-3">
+            <div className="flex items-center flex-wrap gap-3 text-[10px] font-mono">
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-0.5 bg-green-400 inline-block rounded-full"></span>
+                <span className="text-slate-400">Nominal ({activePreset.baselineMetric})</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-0.5 bg-rose-400 border-b border-dashed border-rose-400 inline-block"></span>
+                <span className="text-rose-400">Catastrophic</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-0.5 bg-cyan-400 inline-block rounded-full"></span>
+                <span className="text-cyan-400 font-bold">
+                  {autonomySetting === 'suppressed' ? 'Unmitigated' : 'Remediated'}
+                </span>
+              </div>
+              <div className="px-2 py-0.5 rounded-lg bg-[#05070a] border border-[#1e293b] text-slate-300 font-bold">
+                LIVE: <span className={liveStatusColor}>{liveValueText}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-0.5 bg-rose-400 border-b border-dashed border-rose-400 inline-block"></span>
-              <span className="text-rose-400">Catastrophic Uncorrected</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-3 h-0.5 bg-cyan-400 inline-block rounded-full"></span>
-              <span className="text-cyan-400 font-bold">
-                {autonomySetting === 'suppressed' ? 'Unmitigated Open-Loop' : 'Closed-Loop Remediated'}
-              </span>
-            </div>
-            <div className="px-2 py-0.5 rounded-lg bg-[#05070a] border border-[#1e293b] text-slate-300 font-bold">
-              LIVE: <span className={liveStatusColor}>{liveValueText}</span>
+
+            {/* Quick In-Graph Simulation Launcher */}
+            <div className="flex items-center gap-2 border-l border-[#1e293b] pl-3">
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  resetSim();
+                }}
+                className="px-2.5 py-1.5 rounded-xl bg-[#05070a] border border-[#1e293b] hover:border-slate-400 text-slate-300 text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                title="Reset simulation time and fault states"
+              >
+                <RotateCcw size={12} />
+                RESET
+              </button>
+
+              <button
+                onClick={handleStartSim}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-mono font-bold uppercase flex items-center gap-1.5 transition-all shadow-md cursor-pointer ${
+                  simRunning
+                    ? 'bg-rose-500 text-white animate-pulse'
+                    : 'bg-amber-400 text-black hover:bg-amber-300'
+                }`}
+                title="Run test harness without scrolling up"
+              >
+                <Play size={12} fill="currentColor" />
+                {simRunning ? 'TEST RUNNING...' : 'RUN TEST HARNESS'}
+              </button>
             </div>
           </div>
         </div>
@@ -1609,11 +1639,20 @@ export const ChaosAnomalyLabScreen: React.FC<ChaosAnomalyLabScreenProps> = ({
           />
 
           {simTime === 0 && !simRunning && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-              <div className="bg-[#0f172a]/80 backdrop-blur-md px-4 py-2 rounded-xl border border-cyan-500/30 text-xs font-mono text-cyan-300 shadow-xl flex items-center gap-2">
-                <Play size={12} className="text-amber-400" />
-                <span>CLICK <strong>"RUN TEST HARNESS"</strong> TO STREAM LIVE ERROR TRAJECTORY</span>
-              </div>
+            <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-auto">
+              <button
+                onClick={() => {
+                  sound.playClick();
+                  handleStartSim();
+                }}
+                className="bg-[#0f172a]/90 hover:bg-[#1e293b] backdrop-blur-md px-5 py-2.5 rounded-2xl border border-amber-400/50 hover:border-amber-400 text-xs font-mono text-amber-300 hover:text-white shadow-2xl flex items-center gap-2.5 cursor-pointer transition-all transform hover:scale-105"
+                title="Click to run simulation"
+              >
+                <div className="w-6 h-6 rounded-lg bg-amber-400 text-black flex items-center justify-center font-bold">
+                  <Play size={12} fill="currentColor" />
+                </div>
+                <span>START SIMULATION // <strong>RUN TEST HARNESS</strong></span>
+              </button>
             </div>
           )}
 
