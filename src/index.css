@@ -1,1 +1,127 @@
 @import "tailwindcss";
+
+@layer base {
+  :root {
+    /* OrionCommand Design System Tokens: High-Contrast Warm Neutrals */
+    --orion-canvas: #0c0e12;
+    --orion-surface-1: #13161c;
+    --orion-surface-2: #1a1e26;
+    --orion-surface-3: #242a36;
+    --orion-border: #272d38;
+    --orion-border-subtle: #1e232d;
+    --orion-border-focus: #f59e0b;
+
+    /* Typographic Hierarchy (WCAG AAA anti-glare high contrast) */
+    --orion-text-primary: #f0f2f5;
+    --orion-text-secondary: #9ca3af;
+    --orion-text-muted: #676e7b;
+
+    /* Restrained Accent Palette */
+    --orion-accent: #f59e0b;
+    --orion-accent-hover: #d97706;
+    --orion-accent-glow: rgba(245, 158, 11, 0.22);
+    --orion-accent-subtle: rgba(245, 158, 11, 0.12);
+
+    /* Emergency Actions & Interlocks */
+    --orion-emergency: #ef4444;
+    --orion-emergency-hover: #dc2626;
+    --orion-emergency-glow: rgba(239, 68, 68, 0.28);
+    --orion-emergency-subtle: rgba(239, 68, 68, 0.12);
+
+    /* Nominal Telemetry & Quorum Verification */
+    --orion-nominal: #10b981;
+    --orion-nominal-subtle: rgba(16, 185, 129, 0.14);
+
+    /* Telemetry Secondary Waveform / Vector */
+    --orion-signal-cyan: #38bdf8;
+    --orion-signal-blue: #60a5fa;
+  }
+
+  body {
+    background-color: var(--orion-canvas);
+    color: var(--orion-text-primary);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  ::selection {
+    background-color: #f59e0b;
+    color: #0c0e12;
+  }
+}
+
+/* =========================================================================
+   OrionCommand Design System: High-Contrast Warm Neutral Surface Overrides
+   Maps legacy cold-navy / blue-slate tokens to warm, anti-glare modular cards
+   ========================================================================= */
+.bg-\[\#05070a\] {
+  background-color: #0c0e12 !important;
+}
+
+.bg-\[\#0a1120\] {
+  background-color: #13161c !important;
+}
+
+.bg-\[\#0a1120\]\/90 {
+  background-color: rgba(19, 22, 28, 0.92) !important;
+}
+
+.bg-\[\#0a101f\] {
+  background-color: #151820 !important;
+}
+
+.bg-\[\#0f172a\] {
+  background-color: #1a1e26 !important;
+}
+
+.bg-\[\#1e293b\] {
+  background-color: #242a36 !important;
+}
+
+.border-\[\#1e293b\] {
+  border-color: #272d38 !important;
+}
+
+.border-\[\#334155\] {
+  border-color: #353c4a !important;
+}
+
+/* Custom Tactical Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0c0e12;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #272d38;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
+}
+
+/* Tactical Data Display Grid / CRT Scanline Subtle Backdrop */
+.orion-grid-backdrop {
+  background-image: 
+    linear-gradient(to right, rgba(39, 45, 56, 0.35) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(39, 45, 56, 0.35) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Aerospace Telecommunications Emergency Button Pulse */
+@keyframes orionEmergencyPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
+}
+
+.orion-emergency-pulse {
+  animation: orionEmergencyPulse 2s infinite ease-in-out;
+}

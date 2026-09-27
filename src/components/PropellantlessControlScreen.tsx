@@ -418,20 +418,20 @@ export const PropellantlessControlScreen: React.FC = () => {
         }
       };
 
-      // 1. Space background with deep-space gradient
+      // 1. Space background with deep-space warm obsidian gradient
       const bgGrad = safeRadialGradient(cx, cy, 20, cx, cy, Math.max(width, height) * 0.8);
       if (bgGrad) {
-        bgGrad.addColorStop(0, '#091122');
-        bgGrad.addColorStop(0.5, '#050a14');
-        bgGrad.addColorStop(1, '#010307');
+        bgGrad.addColorStop(0, '#151922');
+        bgGrad.addColorStop(0.5, '#0e1015');
+        bgGrad.addColorStop(1, '#090a0d');
         ctx.fillStyle = bgGrad;
       } else {
-        ctx.fillStyle = '#050a14';
+        ctx.fillStyle = '#0c0e12';
       }
       ctx.fillRect(0, 0, width, height);
 
       // Deep space coordinate grid (tactical matrix)
-      ctx.strokeStyle = 'rgba(30, 41, 59, 0.4)';
+      ctx.strokeStyle = 'rgba(39, 45, 56, 0.45)';
       ctx.lineWidth = 0.5;
       const gridSize = 60;
       for (let gx = 0; gx < width; gx += gridSize) {

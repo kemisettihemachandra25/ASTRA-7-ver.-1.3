@@ -122,7 +122,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ agents }) => {
   return (
     <div className="w-full flex flex-col gap-4">
       {/* Top Mode Switcher */}
-      <div className="flex items-center gap-2 border-b border-[#1e293b] pb-2 font-mono text-xs">
+      <div className="flex items-center gap-2 border-b border-[#272d38] pb-2 font-mono text-xs">
         <button
           onClick={() => {
             sound.playClick();
@@ -130,8 +130,8 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ agents }) => {
           }}
           className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === 'analytics'
-              ? 'bg-cyan-500 text-black font-bold shadow-md'
-              : 'bg-[#0f172a] text-slate-400 hover:text-white border border-[#1e293b]'
+              ? 'bg-amber-500 text-black font-bold shadow-md shadow-amber-500/20'
+              : 'bg-[#1a1e26] text-slate-400 hover:text-white border border-[#272d38]'
           }`}
         >
           <TrendingUp size={14} />
@@ -145,8 +145,8 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ agents }) => {
           }}
           className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === 'sandbox-trials'
-              ? 'bg-cyan-500 text-black font-bold shadow-md'
-              : 'bg-[#0f172a] text-slate-400 hover:text-white border border-[#1e293b]'
+              ? 'bg-amber-500 text-black font-bold shadow-md shadow-amber-500/20'
+              : 'bg-[#1a1e26] text-slate-400 hover:text-white border border-[#272d38]'
           }`}
         >
           <Terminal size={14} />
@@ -160,8 +160,8 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ agents }) => {
           }}
           className={`px-4 py-2 rounded-xl flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === 'database'
-              ? 'bg-cyan-500 text-black font-bold shadow-md'
-              : 'bg-[#0f172a] text-slate-400 hover:text-white border border-[#1e293b]'
+              ? 'bg-amber-500 text-black font-bold shadow-md shadow-amber-500/20'
+              : 'bg-[#1a1e26] text-slate-400 hover:text-white border border-[#272d38]'
           }`}
         >
           <Database size={14} />
@@ -179,9 +179,9 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ agents }) => {
       ) : (
         <>
           {/* Header Bar with Export Options */}
-          <div className="bg-[#0f172a] border border-[#1e293b] p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 shadow-xl">
+          <div className="bg-[#13161c] border border-[#272d38] p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 shadow-xl">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 shadow-sm">
+          <div className="p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 shadow-sm">
             <TrendingUp size={20} />
           </div>
           <div className="flex flex-col">
@@ -189,7 +189,7 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ agents }) => {
               <span className="text-sm text-white font-semibold uppercase tracking-wide">
                 FLIGHT OPERATIONS ANALYTICS & MTTR METRICS
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-cyan-500/10 text-cyan-400 font-bold border border-cyan-500/30">
+              <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-amber-500/10 text-amber-400 font-bold border border-amber-500/30">
                 MISSION DAY 412 // ON-ORBIT ARCHIVE
               </span>
             </div>
@@ -202,15 +202,15 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ agents }) => {
         <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
           <button
             onClick={handleDownloadTrialText}
-            className="px-3 py-2 rounded-xl bg-[#05070a] border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm font-semibold"
+            className="px-3 py-2 rounded-xl bg-[#0c0e12] border border-amber-500/40 hover:border-amber-400 text-amber-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm font-semibold"
             title="Download formatted text trace of all recorded sandbox trials"
           >
-            <FileText size={13} className="text-cyan-400" />
+            <FileText size={13} className="text-amber-400" />
             DOWNLOAD TRIAL TRACE (TXT)
           </button>
           <button
             onClick={handleDownloadTrialCsv}
-            className="px-3 py-2 rounded-xl bg-[#05070a] border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm font-semibold"
+            className="px-3 py-2 rounded-xl bg-[#0c0e12] border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm font-semibold"
             title="Download CSV trace of all recorded sandbox trials"
           >
             <FileSpreadsheet size={13} className="text-emerald-400" />
@@ -218,14 +218,14 @@ export const AnalyticsScreen: React.FC<AnalyticsScreenProps> = ({ agents }) => {
           </button>
           <button
             onClick={handleExportCsv}
-            className="px-3 py-2 rounded-xl bg-[#05070a] border border-[#1e293b] hover:border-cyan-400 text-slate-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+            className="px-3 py-2 rounded-xl bg-[#0c0e12] border border-[#272d38] hover:border-amber-400 text-slate-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
           >
-            <FileSpreadsheet size={13} className="text-green-400" />
+            <FileSpreadsheet size={13} className="text-emerald-400" />
             EXPORT CSV
           </button>
           <button
             onClick={handleExportJson}
-            className="px-3.5 py-2 rounded-xl bg-cyan-500 text-black font-bold uppercase hover:bg-cyan-400 flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+            className="px-3.5 py-2 rounded-xl bg-amber-500 text-black font-bold uppercase hover:bg-amber-400 flex items-center gap-1.5 transition-all cursor-pointer shadow-md shadow-amber-500/20"
           >
             <Download size={13} />
             EXPORT JSON DATASET

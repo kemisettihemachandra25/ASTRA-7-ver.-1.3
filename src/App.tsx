@@ -59,7 +59,7 @@ export default function App() {
   const isolatedCount = agents.filter((a) => a.isolated).length;
 
   return (
-    <div className="min-h-screen bg-[#05070a] text-slate-100 font-sans selection:bg-cyan-500 selection:text-black flex flex-col antialiased">
+    <div className="min-h-screen bg-[#0c0e12] text-[#f0f2f5] font-sans selection:bg-amber-500 selection:text-black flex flex-col antialiased">
       {/* Top Aerospace Mission Header */}
       <Header
         activeScreen={activeScreen}

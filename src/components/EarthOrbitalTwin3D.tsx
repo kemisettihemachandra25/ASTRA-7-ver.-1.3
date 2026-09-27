@@ -176,14 +176,14 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
         }
       };
 
-      // Clear dark aerospace background
-      ctx.fillStyle = '#05070a';
+      // Clear dark aerospace background (OrionCommand warm canvas)
+      ctx.fillStyle = '#0c0e12';
       ctx.fillRect(0, 0, width, height);
 
-      // Draw subtle starry background / grid
+      // Draw subtle warm space grid
       ctx.save();
-      ctx.fillStyle = '#1e293b';
-      ctx.strokeStyle = '#0f172a';
+      ctx.fillStyle = '#1c212b';
+      ctx.strokeStyle = '#181d26';
       ctx.lineWidth = 1;
       const gridSize = 40;
       for (let x = 0; x < width; x += gridSize) {
@@ -736,7 +736,7 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
   ]);
 
   return (
-    <div className="relative w-full h-[460px] sm:h-[500px] bg-[#05070a] overflow-hidden rounded-2xl flex items-center justify-center select-none">
+    <div className="relative w-full h-[460px] sm:h-[500px] bg-[#0c0e12] overflow-hidden rounded-2xl border border-[#272d38] flex items-center justify-center select-none shadow-xl">
       <canvas
         ref={canvasRef}
         className="w-full h-full cursor-grab active:cursor-grabbing"
@@ -762,8 +762,8 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
             onClick={() => handleResetCamera(cam.id)}
             className={`px-2.5 py-1 text-[10px] font-mono uppercase rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
               cameraMode === cam.id
-                ? 'bg-cyan-500 text-black font-bold border-cyan-400 shadow-md shadow-cyan-500/20'
-                : 'bg-[#0f172a]/85 text-slate-300 border-[#1e293b] hover:text-white hover:border-cyan-500/50'
+                ? 'bg-amber-500 text-black font-bold border-amber-400 shadow-md shadow-amber-500/20'
+                : 'bg-[#13161c]/90 text-slate-300 border-[#272d38] hover:text-white hover:border-amber-500/50'
             }`}
           >
             {cam.label}
@@ -773,17 +773,17 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
 
       {/* Top Right: Live HUD Overlay Badge */}
       <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
-        <div className="bg-[#0f172a]/90 border border-[#1e293b] px-3 py-1.5 rounded-xl flex items-center gap-2 backdrop-blur-md text-xs font-mono">
+        <div className="bg-[#13161c]/90 border border-[#272d38] px-3 py-1.5 rounded-xl flex items-center gap-2 backdrop-blur-md text-xs font-mono">
           <span
             className={`w-2 h-2 rounded-full ${
-              solarBetaData.isCurrentlyInShadow ? 'bg-rose-500 animate-pulse' : 'bg-green-400 animate-ping'
+              solarBetaData.isCurrentlyInShadow ? 'bg-red-500 animate-pulse' : 'bg-emerald-400 animate-ping'
             }`}
           />
           <span className="text-slate-300 font-semibold">
             {solarBetaData.isCurrentlyInShadow ? (
-              <span className="text-rose-400 font-bold">UMBRA [ECLIPSE]</span>
+              <span className="text-red-400 font-bold">UMBRA [ECLIPSE]</span>
             ) : (
-              <span className="text-green-400 font-bold">SUNLIT [DIRECT]</span>
+              <span className="text-emerald-400 font-bold">SUNLIT [DIRECT]</span>
             )}
           </span>
           <span className="text-slate-500">|</span>
@@ -791,7 +791,7 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
             β {solarBetaData.betaDeg > 0 ? '+' : ''}{solarBetaData.betaDeg.toFixed(1)}°
           </span>
           <span className="text-slate-500 hidden sm:inline">|</span>
-          <span className="text-cyan-400 font-mono hidden sm:inline">
+          <span className="text-slate-300 font-mono hidden sm:inline">
             v = {PHYSICAL_ORBITAL_VELOCITY_KM_S.toFixed(2)} km/s
           </span>
         </div>
@@ -804,7 +804,7 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
           className={`px-2 py-1 rounded-lg border transition-all cursor-pointer ${
             showContinents
               ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-              : 'bg-[#0f172a]/80 text-slate-400 border-[#1e293b]'
+              : 'bg-[#13161c]/80 text-slate-400 border-[#272d38]'
           }`}
         >
           CONTINENTS
@@ -813,8 +813,8 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
           onClick={() => setShowOrbitRings(!showOrbitRings)}
           className={`px-2 py-1 rounded-lg border transition-all cursor-pointer ${
             showOrbitRings
-              ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40'
-              : 'bg-[#0f172a]/80 text-slate-400 border-[#1e293b]'
+              ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+              : 'bg-[#13161c]/80 text-slate-400 border-[#272d38]'
           }`}
         >
           ORBIT RING
@@ -824,7 +824,7 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
           className={`px-2 py-1 rounded-lg border transition-all cursor-pointer ${
             showSunVector
               ? 'bg-amber-500/20 text-amber-400 border-amber-500/40'
-              : 'bg-[#0f172a]/80 text-slate-400 border-[#1e293b]'
+              : 'bg-[#13161c]/80 text-slate-400 border-[#272d38]'
           }`}
         >
           SUN VECTOR
@@ -833,8 +833,8 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
           onClick={() => setShowTerminator(!showTerminator)}
           className={`px-2 py-1 rounded-lg border transition-all cursor-pointer ${
             showTerminator
-              ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
-              : 'bg-[#0f172a]/80 text-slate-400 border-[#1e293b]'
+              ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+              : 'bg-[#13161c]/80 text-slate-400 border-[#272d38]'
           }`}
         >
           TERMINATOR
@@ -843,8 +843,8 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
           onClick={() => setShowNadirBeam(!showNadirBeam)}
           className={`px-2 py-1 rounded-lg border transition-all cursor-pointer ${
             showNadirBeam
-              ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
-              : 'bg-[#0f172a]/80 text-slate-400 border-[#1e293b]'
+              ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+              : 'bg-[#13161c]/80 text-slate-400 border-[#272d38]'
           }`}
         >
           NADIR BEAM
@@ -852,7 +852,7 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
       </div>
 
       {/* Bottom Right: Playback Speed & Zoom Controls */}
-      <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-[#0f172a]/90 p-1.5 rounded-xl border border-[#1e293b] backdrop-blur-md z-10">
+      <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-[#13161c]/90 p-1.5 rounded-xl border border-[#272d38] backdrop-blur-md z-10">
         <button
           onClick={() => {
             sound.playClick();
@@ -861,7 +861,7 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
           className="p-1 text-slate-300 hover:text-white transition-colors cursor-pointer"
           title={isPlaying ? 'Pause Animation' : 'Play Animation'}
         >
-          {isPlaying ? <Pause size={14} /> : <Play size={14} className="text-cyan-400" />}
+          {isPlaying ? <Pause size={14} /> : <Play size={14} className="text-amber-400" />}
         </button>
 
         <div className="flex items-center gap-1 px-1">
@@ -875,7 +875,7 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
               }}
               className={`px-1.5 py-0.5 text-[9px] font-mono rounded cursor-pointer ${
                 animSpeed === spd && isPlaying
-                  ? 'bg-cyan-500 text-black font-bold shadow-sm'
+                  ? 'bg-amber-500 text-black font-bold shadow-sm'
                   : 'text-slate-400 hover:text-white'
               }`}
             >

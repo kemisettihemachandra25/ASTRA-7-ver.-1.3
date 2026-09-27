@@ -106,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Sidebar Panel */}
       <aside
         id="mission-sidebar"
-        className={`fixed top-16 bottom-0 left-0 w-72 bg-[#0a1120] border-r border-[#1e293b] p-4 flex flex-col justify-between z-40 transition-transform duration-300 ease-in-out shadow-2xl ${
+        className={`fixed top-16 bottom-0 left-0 w-72 bg-[#13161c] border-r border-[#272d38] p-4 flex flex-col justify-between z-40 transition-transform duration-300 ease-in-out shadow-2xl ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -117,7 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             sound.playClick();
             onClose();
           }}
-          className="absolute -right-8 top-5 w-8 h-10 bg-[#0a1120] border-y border-r border-[#1e293b] hover:border-amber-400/50 rounded-r-xl flex items-center justify-center text-slate-400 hover:text-amber-300 shadow-xl cursor-pointer transition-colors z-50 group"
+          className="absolute -right-8 top-5 w-8 h-10 bg-[#13161c] border-y border-r border-[#272d38] hover:border-amber-400/50 rounded-r-xl flex items-center justify-center text-slate-400 hover:text-amber-300 shadow-xl cursor-pointer transition-colors z-50 group"
           title="Retract sidebar"
         >
           <ChevronLeft size={16} className="text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
@@ -125,11 +125,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <div className="flex flex-col gap-4">
           {/* Header Bar with Dedicated Retract Button */}
-          <div className="flex items-center justify-between pb-3 border-b border-[#1e293b]">
+          <div className="flex items-center justify-between pb-3 border-b border-[#272d38]">
             <div className="flex items-center gap-2">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
               </span>
               <span className="text-[11px] font-mono font-bold tracking-wider text-slate-200 uppercase">
                 CONSOLES DOCK
@@ -141,7 +141,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 sound.playClick();
                 onClose();
               }}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#0f172a] hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-[#1e293b] hover:border-amber-500/40 font-mono text-[10.5px] font-bold tracking-wider transition-all cursor-pointer group shadow-sm"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#1a1e26] hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-[#272d38] hover:border-amber-500/40 font-mono text-[10.5px] font-bold tracking-wider transition-all cursor-pointer group shadow-sm"
               title="Retract Navigation Sidebar"
             >
               <PanelLeftClose size={14} className="text-amber-400 group-hover:-translate-x-0.5 transition-transform" />
@@ -150,12 +150,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* Mission IST Clock */}
-          <div className="bg-[#05070a] p-3 rounded-2xl border border-[#1e293b] flex items-center justify-between font-mono text-xs shadow-inner">
+          <div className="bg-[#0c0e12] p-3 rounded-2xl border border-[#272d38] flex items-center justify-between font-mono text-xs shadow-inner">
             <div className="flex items-center gap-2 text-slate-400">
-              <Clock size={14} className="text-cyan-400" />
+              <Clock size={14} className="text-amber-400" />
               <span className="text-[10px] uppercase font-bold text-slate-300">MISSION CLOCK (IST)</span>
             </div>
-            <span className="text-cyan-400 font-bold tracking-wider">{istTime}</span>
+            <span className="text-amber-400 font-bold tracking-wider">{istTime}</span>
           </div>
 
           {/* Navigation Items */}
@@ -176,16 +176,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   }}
                   className={`p-3 rounded-2xl border text-left flex items-center justify-between transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-cyan-500/10 border-cyan-500/40 text-white shadow-sm'
-                      : 'bg-[#05070a]/60 border-transparent text-slate-400 hover:text-slate-200 hover:bg-[#05070a]'
+                      ? 'bg-amber-500/15 border-amber-500/40 text-white shadow-sm'
+                      : 'bg-[#0c0e12]/60 border-transparent text-slate-400 hover:text-slate-200 hover:bg-[#1a1e26]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`p-2 rounded-xl border ${
                         isActive
-                          ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'
-                          : 'bg-[#0f172a] text-slate-400 border-[#1e293b]'
+                          ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                          : 'bg-[#1a1e26] text-slate-400 border-[#272d38]'
                       }`}
                     >
                       <Icon size={16} />
@@ -199,7 +199,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span
                       className={`text-[8px] font-mono font-bold px-1.5 py-0.5 rounded-full border ${
                         item.badge === 'LIVE'
-                          ? 'bg-green-500/10 text-green-400 border-green-500/30'
+                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
                           : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
                       }`}
                     >
@@ -240,7 +240,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onOpenStartupRoutine();
                 onClose();
               }}
-              className="w-full p-2.5 rounded-2xl bg-[#0f172a] hover:bg-emerald-500/10 border border-[#1e293b] hover:border-emerald-500/40 text-slate-300 hover:text-emerald-300 font-mono text-[10px] font-bold uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+              className="w-full p-2.5 rounded-2xl bg-[#1a1e26] hover:bg-emerald-500/10 border border-[#272d38] hover:border-emerald-500/40 text-slate-300 hover:text-emerald-300 font-mono text-[10px] font-bold uppercase flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
             >
               <Rocket size={13} className="text-emerald-400" />
               <span>ORION STARTUP SEQUENCE</span>
@@ -249,22 +249,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Ephemeris Footer Summary */}
-        <div className="pt-3 border-t border-[#1e293b] font-mono text-[10px] text-slate-400 flex flex-col gap-1.5">
+        <div className="pt-3 border-t border-[#272d38] font-mono text-[10px] text-slate-400 flex flex-col gap-1.5">
           <div className="flex justify-between">
             <span>SATELLITE:</span>
             <span className="text-slate-200 font-bold">ORION</span>
           </div>
           <div className="flex justify-between">
             <span>NORAD ID:</span>
-            <span className="text-cyan-400">59421</span>
+            <span className="text-amber-400">59421</span>
           </div>
           <div className="flex justify-between">
             <span>INCLINATION:</span>
             <span className="text-slate-200">97.6° SSO</span>
           </div>
-          <div className="flex justify-between items-center pt-1 border-t border-[#1e293b]/60">
-            <span className="flex items-center gap-1.5 text-green-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+          <div className="flex justify-between items-center pt-1 border-t border-[#272d38]/60">
+            <span className="flex items-center gap-1.5 text-emerald-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               RF LINK LOCKED
             </span>
             <span className="text-slate-400">19.2 dB SNR</span>

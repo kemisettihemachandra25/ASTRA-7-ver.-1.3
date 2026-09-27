@@ -105,9 +105,9 @@ export const SandboxTrialTraceViewer: React.FC<SandboxTrialTraceViewerProps> = (
   return (
     <div className="w-full flex flex-col gap-5">
       {/* Header Banner */}
-      <div className="bg-[#0f172a] border border-[#1e293b] p-5 rounded-2xl flex flex-wrap items-center justify-between gap-4 shadow-xl">
+      <div className="bg-[#13161c] border border-[#272d38] p-5 rounded-2xl flex flex-wrap items-center justify-between gap-4 shadow-xl">
         <div className="flex items-center gap-3">
-          <div className="p-3 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 shadow-sm">
+          <div className="p-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 shadow-sm">
             <Terminal size={22} />
           </div>
           <div className="flex flex-col">
@@ -115,7 +115,7 @@ export const SandboxTrialTraceViewer: React.FC<SandboxTrialTraceViewerProps> = (
               <span className="text-sm text-white font-semibold uppercase tracking-wide">
                 SANDBOX TRIAL JOURNAL TRACES & REASONING LOGS
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-cyan-500/10 text-cyan-400 font-bold border border-cyan-500/30">
+              <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-amber-500/10 text-amber-400 font-bold border border-amber-500/30">
                 ORION-7 TELEMETRY PIPELINE
               </span>
             </div>
@@ -129,16 +129,16 @@ export const SandboxTrialTraceViewer: React.FC<SandboxTrialTraceViewerProps> = (
         <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
           <button
             onClick={() => handleDownloadText()}
-            className="px-3 py-2 rounded-xl bg-[#05070a] border border-cyan-500/40 hover:border-cyan-400 text-cyan-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm font-semibold"
+            className="px-3 py-2 rounded-xl bg-[#0c0e12] border border-amber-500/40 hover:border-amber-400 text-amber-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm font-semibold"
             title="Download formatted text file of all recorded sandbox trials"
           >
-            <FileText size={14} className="text-cyan-400" />
+            <FileText size={14} className="text-amber-400" />
             DOWNLOAD TRACE (TXT)
           </button>
 
           <button
             onClick={() => handleDownloadCsv()}
-            className="px-3 py-2 rounded-xl bg-[#05070a] border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm font-semibold"
+            className="px-3 py-2 rounded-xl bg-[#0c0e12] border border-emerald-500/40 hover:border-emerald-400 text-emerald-300 hover:text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-sm font-semibold"
             title="Download CSV table of all recorded sandbox trial logs"
           >
             <FileSpreadsheet size={14} className="text-emerald-400" />

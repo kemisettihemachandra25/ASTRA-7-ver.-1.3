@@ -249,24 +249,24 @@ export const PulseTrajectoryGraph: React.FC<PulseTrajectoryGraphProps> = ({
   return (
     <div
       ref={containerRef}
-      className="bg-[#0f172a] border border-[#1e293b] rounded-3xl p-5 flex flex-col gap-4 shadow-xl hover:border-cyan-500/30 transition-all"
+      className="bg-[#13161c] border border-[#272d38] rounded-3xl p-5 flex flex-col gap-4 shadow-xl hover:border-amber-500/30 transition-all"
     >
       {/* Header Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1e293b] pb-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#272d38] pb-3.5">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+          <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
             <TrendingUp size={18} />
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold text-cyan-400">
+              <span className="font-mono text-xs font-bold text-amber-400">
                 POST-ACTUATION TRAJECTORY DYNAMICS //
               </span>
               <span className="text-xs uppercase text-slate-100 font-semibold">
                 Live Kinetic Telemetry After Thruster Pulses
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-green-500/10 text-green-400 border border-green-500/30 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+              <span className="px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 STREAMING 50Hz
               </span>
             </div>
@@ -277,7 +277,7 @@ export const PulseTrajectoryGraph: React.FC<PulseTrajectoryGraphProps> = ({
         </div>
 
         {/* View Mode Selector Tabs */}
-        <div className="flex items-center gap-1.5 bg-[#05070a] p-1 rounded-xl border border-[#1e293b] font-mono text-xs">
+        <div className="flex items-center gap-1.5 bg-[#0c0e12] p-1 rounded-xl border border-[#272d38] font-mono text-xs">
           {(
             [
               { id: 'ALTITUDE' as GraphMode, label: 'ALTITUDE (Δh)', icon: TrendingUp },
@@ -297,7 +297,7 @@ export const PulseTrajectoryGraph: React.FC<PulseTrajectoryGraphProps> = ({
                 }}
                 className={`px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1.5 cursor-pointer transition-all ${
                   isSelected
-                    ? 'bg-cyan-500 text-black shadow-md'
+                    ? 'bg-amber-500 text-black font-bold shadow-md shadow-amber-500/20'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
