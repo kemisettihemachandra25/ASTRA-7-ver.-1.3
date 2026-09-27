@@ -371,8 +371,10 @@ export const PropellantlessControlScreen: React.FC = () => {
 
     const render = () => {
       const rect = container.getBoundingClientRect();
-      const width = rect.width > 0 ? rect.width : 680;
-      const height = rect.height > 0 ? rect.height : (isExpanded ? 580 : 440);
+      const rawWidth = rect.width > 0 ? rect.width : 680;
+      const rawHeight = rect.height > 0 ? rect.height : (isExpanded ? 580 : 440);
+      const width = Number.isFinite(rawWidth) && rawWidth > 0 ? rawWidth : 680;
+      const height = Number.isFinite(rawHeight) && rawHeight > 0 ? rawHeight : (isExpanded ? 580 : 440);
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
       const targetWidth = Math.round(width * dpr);
@@ -394,12 +396,38 @@ export const PropellantlessControlScreen: React.FC = () => {
       const cx = width / 2;
       const cy = height / 2;
 
+      // Safe helper for Canvas Radial Gradients
+      const safeRadialGradient = (
+        x0: number,
+        y0: number,
+        r0: number,
+        x1: number,
+        y1: number,
+        r1: number
+      ): CanvasGradient | null => {
+        const sx0 = Number.isFinite(x0) ? x0 : cx;
+        const sy0 = Number.isFinite(y0) ? y0 : cy;
+        const sr0 = Number.isFinite(r0) && r0 >= 0 ? r0 : 0;
+        const sx1 = Number.isFinite(x1) ? x1 : cx;
+        const sy1 = Number.isFinite(y1) ? y1 : cy;
+        const sr1 = Number.isFinite(r1) && r1 >= 0 ? r1 : sr0 + 1;
+        try {
+          return ctx.createRadialGradient(sx0, sy0, sr0, sx1, sy1, sr1);
+        } catch {
+          return null;
+        }
+      };
+
       // 1. Space background with deep-space gradient
-      const bgGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, Math.max(width, height) * 0.8);
-      bgGrad.addColorStop(0, '#091122');
-      bgGrad.addColorStop(0.5, '#050a14');
-      bgGrad.addColorStop(1, '#010307');
-      ctx.fillStyle = bgGrad;
+      const bgGrad = safeRadialGradient(cx, cy, 20, cx, cy, Math.max(width, height) * 0.8);
+      if (bgGrad) {
+        bgGrad.addColorStop(0, '#091122');
+        bgGrad.addColorStop(0.5, '#050a14');
+        bgGrad.addColorStop(1, '#010307');
+        ctx.fillStyle = bgGrad;
+      } else {
+        ctx.fillStyle = '#050a14';
+      }
       ctx.fillRect(0, 0, width, height);
 
       // Deep space coordinate grid (tactical matrix)
@@ -558,32 +586,45 @@ export const PropellantlessControlScreen: React.FC = () => {
       // 6. Earth Body with Realistic Atmosphere & Day/Night Rim
       ctx.save();
       // Outer atmospheric Rayleigh scattering glow
-      const atmoGrad = ctx.createRadialGradient(cx, cy, earthRadius * 0.95, cx, cy, earthRadius * 1.15);
-      atmoGrad.addColorStop(0, 'rgba(56, 189, 248, 0.45)');
-      atmoGrad.addColorStop(0.5, 'rgba(14, 165, 233, 0.18)');
-      atmoGrad.addColorStop(1, 'rgba(2, 132, 199, 0)');
-      ctx.fillStyle = atmoGrad;
-      ctx.beginPath();
-      ctx.arc(cx, cy, earthRadius * 1.15, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Earth body disk
-      const earthGrad = ctx.createRadialGradient(
-        cx + earthRadius * 0.45,
-        cy - earthRadius * 0.2,
-        earthRadius * 0.1,
+      const atmoGrad = safeRadialGradient(
         cx,
         cy,
-        earthRadius
+        Math.max(0, earthRadius * 0.95),
+        cx,
+        cy,
+        Math.max(1, earthRadius * 1.15)
       );
-      earthGrad.addColorStop(0, '#38bdf8');
-      earthGrad.addColorStop(0.35, '#0284c7');
-      earthGrad.addColorStop(0.7, '#075985');
-      earthGrad.addColorStop(1, '#082f49');
+      if (atmoGrad) {
+        atmoGrad.addColorStop(0, 'rgba(56, 189, 248, 0.45)');
+        atmoGrad.addColorStop(0.5, 'rgba(14, 165, 233, 0.18)');
+        atmoGrad.addColorStop(1, 'rgba(2, 132, 199, 0)');
+        ctx.fillStyle = atmoGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, earthRadius * 1.15, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Earth body disk
+      const earthGrad = safeRadialGradient(
+        cx + earthRadius * 0.45,
+        cy - earthRadius * 0.2,
+        Math.max(0, earthRadius * 0.1),
+        cx,
+        cy,
+        Math.max(1, earthRadius)
+      );
+      if (earthGrad) {
+        earthGrad.addColorStop(0, '#38bdf8');
+        earthGrad.addColorStop(0.35, '#0284c7');
+        earthGrad.addColorStop(0.7, '#075985');
+        earthGrad.addColorStop(1, '#082f49');
+        ctx.fillStyle = earthGrad;
+      } else {
+        ctx.fillStyle = '#0284c7';
+      }
 
       ctx.beginPath();
       ctx.arc(cx, cy, earthRadius, 0, Math.PI * 2);
-      ctx.fillStyle = earthGrad;
       ctx.fill();
 
       // Earth latitude & longitude graticules for depth
@@ -890,17 +931,21 @@ export const PropellantlessControlScreen: React.FC = () => {
       ctx.save();
       const sunX = width - 45;
       const sunY = 45;
-      const sunPulse = 18 + Math.sin(simTime * 2) * 1.5;
+      const safeSimTime = Number.isFinite(simTime) ? simTime : 0;
+      const rawSunPulse = 18 + Math.sin(safeSimTime * 2) * 1.5;
+      const sunPulse = Number.isFinite(rawSunPulse) && rawSunPulse > 5 ? rawSunPulse : 18;
 
       // Solar Corona Glow
-      const sunCorona = ctx.createRadialGradient(sunX, sunY, 5, sunX, sunY, sunPulse * 1.6);
-      sunCorona.addColorStop(0, 'rgba(254, 240, 138, 0.9)');
-      sunCorona.addColorStop(0.5, 'rgba(250, 204, 21, 0.4)');
-      sunCorona.addColorStop(1, 'rgba(234, 179, 8, 0)');
-      ctx.fillStyle = sunCorona;
-      ctx.beginPath();
-      ctx.arc(sunX, sunY, sunPulse * 1.6, 0, Math.PI * 2);
-      ctx.fill();
+      const sunCorona = safeRadialGradient(sunX, sunY, 5, sunX, sunY, sunPulse * 1.6);
+      if (sunCorona) {
+        sunCorona.addColorStop(0, 'rgba(254, 240, 138, 0.9)');
+        sunCorona.addColorStop(0.5, 'rgba(250, 204, 21, 0.4)');
+        sunCorona.addColorStop(1, 'rgba(234, 179, 8, 0)');
+        ctx.fillStyle = sunCorona;
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, sunPulse * 1.6, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       // Sun Disk
       ctx.fillStyle = '#fef08a';

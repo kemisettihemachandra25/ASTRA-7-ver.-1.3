@@ -135,15 +135,46 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
       }
 
       // Handle canvas high-DPI scaling
-      const width = canvas.clientWidth;
-      const height = canvas.clientHeight;
-      const dpr = window.devicePixelRatio || 1;
-      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
-        canvas.width = width * dpr;
-        canvas.height = height * dpr;
+      const rawWidth = canvas.clientWidth || 0;
+      const rawHeight = canvas.clientHeight || 0;
+      const width = Number.isFinite(rawWidth) && rawWidth > 0 ? rawWidth : 600;
+      const height = Number.isFinite(rawHeight) && rawHeight > 0 ? rawHeight : 460;
+
+      // Skip frame if container has collapsed to zero during layout transitions
+      if (width < 20 || height < 20) {
+        requestRef.current = requestAnimationFrame(render);
+        return;
+      }
+
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
       }
       ctx.resetTransform();
       ctx.scale(dpr, dpr);
+
+      // Safe helper for Canvas Radial Gradients to guarantee finite numbers and valid radii
+      const safeRadialGradient = (
+        x0: number,
+        y0: number,
+        r0: number,
+        x1: number,
+        y1: number,
+        r1: number
+      ): CanvasGradient | null => {
+        const sx0 = Number.isFinite(x0) ? x0 : cx;
+        const sy0 = Number.isFinite(y0) ? y0 : cy;
+        const sr0 = Number.isFinite(r0) && r0 >= 0 ? r0 : 0;
+        const sx1 = Number.isFinite(x1) ? x1 : cx;
+        const sy1 = Number.isFinite(y1) ? y1 : cy;
+        const sr1 = Number.isFinite(r1) && r1 >= 0 ? r1 : sr0 + 1;
+        try {
+          return ctx.createRadialGradient(sx0, sy0, sr0, sx1, sy1, sr1);
+        } catch {
+          return null;
+        }
+      };
 
       // Clear dark aerospace background
       ctx.fillStyle = '#05070a';
@@ -171,13 +202,19 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
 
       const cx = width / 2;
       const cy = height / 2;
-      const earthRadius = Math.min(width, height) * 0.23 * zoom;
+      const safeZoom = Number.isFinite(zoom) && zoom > 0.05 ? zoom : 1.0;
+      const earthRadius = Math.max(20, Math.min(width, height) * 0.23 * safeZoom);
       const orbitRadius = earthRadius * 1.34; // Proportional LEO altitude
 
       // Current astronomical state
       const gmst = getGMST(currentDate) + (isPlaying ? animTimeRef.current * EARTH_TO_ORBIT_ROTATION_RATIO : 0);
-      const sunVec = solarBetaData.sunVectorECI;
-      const raanRad = (solarBetaData.raanDeg * Math.PI) / 180;
+      const rawSunVec = solarBetaData?.sunVectorECI || [1, 0, 0];
+      const sunVec: [number, number, number] = [
+        Number.isFinite(rawSunVec[0]) ? rawSunVec[0] : 1,
+        Number.isFinite(rawSunVec[1]) ? rawSunVec[1] : 0,
+        Number.isFinite(rawSunVec[2]) ? rawSunVec[2] : 0,
+      ];
+      const raanRad = ((Number.isFinite(solarBetaData?.raanDeg) ? solarBetaData.raanDeg : 0) * Math.PI) / 180;
       const inclination = ORBIT_INCLINATION_RAD;
 
       // Satellite true anomaly along orbit (0 to 2*PI)
@@ -192,12 +229,13 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
       const satEciZ = orbitRadius * (pOy * Math.sin(inclination));
 
       // Chase camera tracking
-      let activeYaw = yaw;
-      let activePitch = pitch;
+      let activeYaw = Number.isFinite(yaw) ? yaw : 0.65;
+      let activePitch = Number.isFinite(pitch) ? pitch : -0.42;
       if (cameraMode === 'chase-sat') {
         const satAngle = Math.atan2(satEciY, satEciX);
-        activeYaw = satAngle - 0.4;
-        activePitch = Math.max(-1.1, Math.min(1.1, -(satEciZ / orbitRadius) * 0.5 - 0.2));
+        activeYaw = Number.isFinite(satAngle) ? satAngle - 0.4 : 0.65;
+        const normZ = satEciZ / Math.max(orbitRadius, 1);
+        activePitch = Math.max(-1.1, Math.min(1.1, -(Number.isFinite(normZ) ? normZ : 0) * 0.5 - 0.2));
       }
 
       // Camera Transformation Matrix: rotate around Y (yaw) then X (pitch)
@@ -208,19 +246,31 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
 
       // Transform ECI vector [x, y, z] to View/Screen coords
       const project = (x: number, y: number, z: number): { sx: number; sy: number; depth: number } => {
-        const x1 = x * cosY - y * sinY;
-        const y1 = x * sinY + y * cosY;
-        const z1 = z;
+        const safeX = Number.isFinite(x) ? x : 0;
+        const safeY = Number.isFinite(y) ? y : 0;
+        const safeZ = Number.isFinite(z) ? z : 0;
+
+        const x1 = safeX * cosY - safeY * sinY;
+        const y1 = safeX * sinY + safeY * cosY;
+        const z1 = safeZ;
 
         const x2 = x1;
         const y2 = y1 * cosP - z1 * sinP;
         const z2 = y1 * sinP + z1 * cosP;
 
-        const persp = 1 + (y2 / (earthRadius * 12));
+        const denom = Math.max(earthRadius * 12, 100);
+        let persp = 1 + (y2 / denom);
+        if (!Number.isFinite(persp) || persp <= 0.05) {
+          persp = 0.05;
+        }
+
+        const rawSx = cx + x2 * persp;
+        const rawSy = cy - z2 * persp;
+
         return {
-          sx: cx + x2 * persp,
-          sy: cy - z2 * persp,
-          depth: y2,
+          sx: Number.isFinite(rawSx) ? rawSx : cx,
+          sy: Number.isFinite(rawSy) ? rawSy : cy,
+          depth: Number.isFinite(y2) ? y2 : 0,
         };
       };
 
@@ -229,14 +279,23 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
 
       // 1. Draw Earth Atmospheric Rim Glow (Behind Earth)
       ctx.save();
-      const atmoGrad = ctx.createRadialGradient(cx, cy, earthRadius * 0.85, cx, cy, earthRadius * 1.15);
-      atmoGrad.addColorStop(0, 'rgba(34, 211, 238, 0.25)');
-      atmoGrad.addColorStop(0.5, 'rgba(6, 182, 212, 0.08)');
-      atmoGrad.addColorStop(1, 'rgba(6, 182, 212, 0)');
-      ctx.fillStyle = atmoGrad;
-      ctx.beginPath();
-      ctx.arc(cx, cy, earthRadius * 1.15, 0, Math.PI * 2);
-      ctx.fill();
+      const atmoGrad = safeRadialGradient(
+        cx,
+        cy,
+        Math.max(0, earthRadius * 0.85),
+        cx,
+        cy,
+        Math.max(1, earthRadius * 1.15)
+      );
+      if (atmoGrad) {
+        atmoGrad.addColorStop(0, 'rgba(34, 211, 238, 0.25)');
+        atmoGrad.addColorStop(0.5, 'rgba(6, 182, 212, 0.08)');
+        atmoGrad.addColorStop(1, 'rgba(6, 182, 212, 0)');
+        ctx.fillStyle = atmoGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, earthRadius * 1.15, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.restore();
 
       // 2. Draw Back-Half of Orbital Ring (Behind Earth, depth < 0)
@@ -281,18 +340,24 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
 
       // 3. Draw Earth Wireframe Sphere
       ctx.save();
-      const globeGrad = ctx.createRadialGradient(
-        cx + (sunProj.sx - cx) * 0.25,
-        cy + (sunProj.sy - cy) * 0.25,
-        earthRadius * 0.2,
+      const sunProjSx = Number.isFinite(sunProj.sx) ? sunProj.sx : cx;
+      const sunProjSy = Number.isFinite(sunProj.sy) ? sunProj.sy : cy;
+      const globeGrad = safeRadialGradient(
+        cx + (sunProjSx - cx) * 0.25,
+        cy + (sunProjSy - cy) * 0.25,
+        Math.max(0, earthRadius * 0.2),
         cx,
         cy,
-        earthRadius
+        Math.max(1, earthRadius)
       );
-      globeGrad.addColorStop(0, '#0b192e');
-      globeGrad.addColorStop(0.7, '#07101e');
-      globeGrad.addColorStop(1, '#020610');
-      ctx.fillStyle = globeGrad;
+      if (globeGrad) {
+        globeGrad.addColorStop(0, '#0b192e');
+        globeGrad.addColorStop(0.7, '#07101e');
+        globeGrad.addColorStop(1, '#020610');
+        ctx.fillStyle = globeGrad;
+      } else {
+        ctx.fillStyle = '#0b192e';
+      }
       ctx.beginPath();
       ctx.arc(cx, cy, earthRadius, 0, Math.PI * 2);
       ctx.fill();
@@ -414,23 +479,28 @@ export const EarthOrbitalTwin3D: React.FC<EarthOrbitalTwin3DProps> = ({
       if (showTerminator) {
         ctx.save();
         const sunDotView = project(sunVec[0] * earthRadius, sunVec[1] * earthRadius, sunVec[2] * earthRadius);
-        const sunAngle = Math.atan2(sunDotView.sy - cy, sunDotView.sx - cx);
+        const sdvX = Number.isFinite(sunDotView.sx) ? sunDotView.sx : cx;
+        const sdvY = Number.isFinite(sunDotView.sy) ? sunDotView.sy : cy;
+        const rawSunAngle = Math.atan2(sdvY - cy, sdvX - cx);
+        const sunAngle = Number.isFinite(rawSunAngle) ? rawSunAngle : 0;
 
-        const termGrad = ctx.createRadialGradient(
+        const termGrad = safeRadialGradient(
           cx + Math.cos(sunAngle) * earthRadius * 0.4,
           cy + Math.sin(sunAngle) * earthRadius * 0.4,
-          earthRadius * 0.1,
+          Math.max(0, earthRadius * 0.1),
           cx - Math.cos(sunAngle) * earthRadius * 0.5,
           cy - Math.sin(sunAngle) * earthRadius * 0.5,
-          earthRadius * 1.05
+          Math.max(1, earthRadius * 1.05)
         );
-        termGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-        termGrad.addColorStop(0.48, 'rgba(2, 6, 23, 0.1)');
-        termGrad.addColorStop(0.55, 'rgba(2, 6, 23, 0.65)');
-        termGrad.addColorStop(1, 'rgba(1, 4, 15, 0.88)');
+        if (termGrad) {
+          termGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+          termGrad.addColorStop(0.48, 'rgba(2, 6, 23, 0.1)');
+          termGrad.addColorStop(0.55, 'rgba(2, 6, 23, 0.65)');
+          termGrad.addColorStop(1, 'rgba(1, 4, 15, 0.88)');
 
-        ctx.fillStyle = termGrad;
-        ctx.fillRect(cx - earthRadius, cy - earthRadius, earthRadius * 2, earthRadius * 2);
+          ctx.fillStyle = termGrad;
+          ctx.fillRect(cx - earthRadius, cy - earthRadius, earthRadius * 2, earthRadius * 2);
+        }
         ctx.restore();
       }
 
